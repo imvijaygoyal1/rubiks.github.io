@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rubik’s Cube Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cube-red:#e53935;
+    --cube-blue:#1e88e5;
+    --cube-green:#43a047;
+    --cube-orange:#fb8c00;
+    --cube-yellow:#fdd835;
+    --cube-white:#fafafa;
+    --bg-dark:#0d0f14;
+    --ink:#0b0b0c;
+    --muted:#6b7280;
+    --card:#131722;
+    --accent:#8e24aa;
+    --shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:linear-gradient(135deg,#0f172a,#111827 40%,#0b132b);color:#e5e7eb;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  a{color:#93c5fd;text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(8px);
+    background:rgba(17,24,39,.7);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .nav{
+    max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:12px 20px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
+  .brand .logo{width:34px;height:34px;display:inline-grid;grid-template-columns:repeat(3,1fr);gap:2px}
+  .brand .logo span{display:block;width:100%;height:100%;border-radius:4px}
+  .spacer{flex:1}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px}
+  .tab-btn{
+    padding:10px 12px;border:1px solid rgba(255,255,255,.12);background:#0f172a;
+    border-radius:12px;color:#e5e7eb;cursor:pointer;font-weight:600;
+    transition:.2s transform,.2s background,.2s color;
+  }
+  .tab-btn:hover{transform:translateY(-1px);background:#111827}
+  .tab-btn.active{background:linear-gradient(135deg,var(--cube-blue),var(--cube-green));color:#fff;border-color:transparent}
+  main{max-width:1100px;margin:24px auto;padding:0 20px}
+  section.page{display:none;animation:fade .35s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* Home */
+  .hero{
+    display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;
+    background:radial-gradient(1200px 600px at 10% 10%, rgba(142,36,170,.15), transparent 60%),
+               radial-gradient(1000px 500px at 90% 10%, rgba(30,136,229,.15), transparent 60%),
+               linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;padding:28px;box-shadow:var(--shadow);
+  }
+  .hero h1{font-size:clamp(28px,4vw,44px);margin:0 0 8px 0;line-height:1.1}
+  .hero p{color:#cbd5e1;margin:0 0 16px 0}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .badge{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.14);background:#0b1320}
+  .cube-gallery{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+  .svg-cube{width:100%;height:auto;display:block;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
+  .fact-box{margin-top:18px;background:#0d1220;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
+  .fact-box h3{margin:0 0 10px 0}
+  .btn{display:inline-block;background:linear-gradient(135deg,var(--cube-orange),var(--cube-yellow));
+       color:#111827;font-weight:800;padding:10px 14px;border:none;border-radius:12px;cursor:pointer;
+       transition:.2s transform;box-shadow:0 10px 18px rgba(251,140,0,.25)}
+  .btn:hover{transform:translateY(-1px)}
+  .note{font-size:12px;color:#9ca3af;margin-top:6px}
+  /* Content blocks */
+  .prose{line-height:1.7;color:#e5e7eb}
+  .grid{display:grid;gap:16px}
+  .cols-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .link-card{background:#0f1628;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px}
+  .link-card h4{margin:0 0 6px 0}
+  .small{font-size:13px;color:#cbd5e1}
+  .muted{color:#9ca3af}
+  footer{margin:40px 0 30px;color:#94a3b8;text-align:center;font-size:12px}
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:16px}
+    .cube-gallery{grid-template-columns:1fr}
+  }
+
+  /* Mosaic "MY GPT" button made of minute Rubik's cubes */
+  .gpt-wrap { margin-top: 18px; }
+  .gpt-btn{
+    display:inline-block;
+    background:#0f1628;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:16px;
+    padding:14px;
+    cursor:pointer;
+    box-shadow: var(--shadow);
+    transition:.2s transform,.2s box-shadow;
+  }
+  .gpt-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 28px rgba(0,0,0,.35); }
+  .mosaic{
+    display:flex; align-items:center; gap:10px;
+  }
+  .letter{
+    display:grid;
+    grid-template-columns: repeat(7, 10px);
+    grid-auto-rows: 10px;
+    gap:2px;
+    padding:4px;
+    background:rgba(255,255,255,.03);
+    border-radius:8px;
+  }
+  .pix{
+    width:10px; height:10px; border-radius:2px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.35);
+  }
+  /* Cubelet color palette cycling for variety */
+  .c1{ background:var(--cube-red); }
+  .c2{ background:var(--cube-blue); }
+  .c3{ background:var(--cube-green); }
+  .c4{ background:var(--cube-orange); }
+  .c5{ background:var(--cube-yellow); }
+  .c6{ background:var(--cube-white); }
+  .spacer-1{ width:8px; display:inline-block }
+  .visually-hidden{ position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+
+
+  /* Subtle pulse on hover/focus */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+  .gpt-btn.pulsing { animation: pulse 900ms ease-in-out infinite; }
+  .gpt-btn:focus { outline: 2px solid var(--cube-yellow); outline-offset: 4px; }
+
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <span style="background:var(--cube-red)"></span>
+        <span style="background:var(--cube-blue)"></span>
+        <span style="background:var(--cube-green)"></span>
+        <span style="background:var(--cube-orange)"></span>
+        <span style="background:var(--cube-yellow)"></span>
+        <span style="background:var(--cube-white)"></span>
+        <span style="background:var(--cube-blue)"></span>
+        <span style="background:var(--cube-green)"></span>
+        <span style="background:var(--cube-red)"></span>
+      </span>
+      <span>Rubik’s Cube Hub</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="tabs" role="tablist" aria-label="Site tabs">
+      <button class="tab-btn active" data-target="home" role="tab" aria-selected="true">Home</button>
+      <button class="tab-btn" data-target="history" role="tab">History</button>
+      <button class="tab-btn" data-target="types" role="tab">Types</button>
+      <button class="tab-btn" data-target="records" role="tab">Records</button>
+      <button class="tab-btn" data-target="wca" role="tab">WCA</button>
+      <button class="tab-btn" data-target="art" role="tab">Art & Exhibits</button>
+      <button class="tab-btn" data-target="community" role="tab">Community</button>
+      <button class="tab-btn" data-target="references" role="tab">References</button>
+      <button class="tab-btn" data-target="myhobby" role="tab">My Hobby</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="home" class="page active" aria-labelledby="home-tab">
+    <div class="hero">
+      <div>
+        <h1>Twist. Learn. Have Fun.</h1>
+        <p>A bright and modern hub for everything Rubik’s Cube — history, types, records, art, and community.
+           Explore the tabs above and start your journey.</p>
+        <div class="badges">
+          <span class="badge">Beginner‑friendly</span>
+          <span class="badge">Data‑curious</span>
+          <span class="badge">Colorful &amp; sharp</span>
+        </div>
+
+        <div class="fact-box">
+          <h3>Fun fact about Rubik’s Cube</h3>
+          <p id="fact-text" class="small muted">Click the button to reveal a unique fact.</p>
+          <button id="fact-btn" class="btn" aria-controls="fact-text">Surprise me</button>
+          <div class="note">Facts span history, creator, art, science, math, and algorithms.</div>
+        </div>
+      </div>
+
+      <div class="cube-gallery">
+        <div class="card">
+          <!-- Bright Cube 1 (SVG is self-contained and sharp) -->
+          <svg class="svg-cube" viewBox="0 0 200 200" role="img" aria-label="Bright Rubik’s cube illustration">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity=".25"/>
+                <stop offset="1" stop-color="#000000" stop-opacity=".25"/>
+              </linearGradient>
+            </defs>
+            <!-- Outer cube with 3 faces -->
+            <g transform="translate(30,20)">
+              <!-- Top -->
+              <polygon points="40,0 140,0 170,20 70,20" fill="var(--cube-yellow)"/>
+              <!-- Left -->
+              <polygon points="40,0 70,20 70,120 40,100" fill="var(--cube-blue)"/>
+              <!-- Right -->
+              <polygon points="140,0 170,20 170,120 140,100" fill="var(--cube-red)"/>
+              <!-- Front -->
+              <polygon points="70,20 170,20 170,120 70,120" fill="var(--cube-green)"/>
+              <!-- Grid lines -->
+              <g stroke="#0b0b0c" stroke-width="2" opacity=".7">
+                <line x1="100" y1="20" x2="100" y2="120"/>
+                <line x1="135" y1="20" x2="135" y2="120"/>
+                <line x1="70" y1="53" x2="170" y2="53"/>
+                <line x1="70" y1="86" x2="170" y2="86"/>
+              </g>
+              <!-- Gloss -->
+              <ellipse cx="120" cy="40" rx="40" ry="12" fill="url(#g1)" opacity=".28"/>
+            </g>
+          </svg>
+        </div>
+        <div class="card">
+          <!-- Bright Cube 2 -->
+          <svg class="svg-cube" viewBox="0 0 200 200" role="img" aria-label="Bright Rubik’s cube illustration">
+            <defs>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity=".22"/>
+                <stop offset="1" stop-color="#000000" stop-opacity=".22"/>
+              </linearGradient>
+            </defs>
+            <g transform="translate(20,25) rotate(-8 100 100)">
+              <polygon points="50,0 150,0 180,20 80,20" fill="var(--cube-white)"/>
+              <polygon points="50,0 80,20 80,130 50,110" fill="var(--cube-orange)"/>
+              <polygon points="150,0 180,20 180,130 150,110" fill="var(--cube-green)"/>
+              <polygon points="80,20 180,20 180,130 80,130" fill="var(--cube-yellow)"/>
+              <g stroke="#0b0b0c" stroke-width="2" opacity=".7">
+                <line x1="110" y1="20" x2="110" y2="130"/>
+                <line x1="145" y1="20" x2="145" y2="130"/>
+                <line x1="80" y1="53" x2="180" y2="53"/>
+                <line x1="80" y1="86" x2="180" y2="86"/>
+              </g>
+              <ellipse cx="125" cy="42" rx="42" ry="12" fill="url(#g2)" opacity=".32"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history" class="page" aria-labelledby="history-tab">
+    <div class="prose">
+      <h2>History</h2>
+      <p>The Rubik’s Cube was invented in 1974 by Ernő Rubik, a Hungarian architect and professor.
+         It began as a teaching tool to explain 3D spatial relationships. In 1980, it launched globally and
+         quickly became a worldwide craze. Since then, new methods, competitions, and variations have
+         kept the cube popular across generations.</p>
+      <p>Over time, speedsolving techniques like CFOP, Roux, and ZZ emerged. Hardware also improved with
+         magnets, better corner cutting, and smoother mechanisms, helping solvers achieve astonishing times.</p>
+    </div>
+  </section>
+
+  <!-- TYPES -->
+  <section id="types" class="page" aria-labelledby="types-tab">
+    <h2>Types & Variations</h2>
+    <p class="muted">Explore popular puzzles and learn more via the links.</p>
+    <div class="grid cols-3">
+      <div class="link-card"><h4>2×2 (Pocket Cube)</h4><p class="small">A simpler, corner‑only cube.</p><a href="https://en.wikipedia.org/wiki/Pocket_Cube" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>3×3 (Classic)</h4><p class="small">The original and most popular cube.</p><a href="https://en.wikipedia.org/wiki/Rubik%27s_Cube" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>4×4 (Rubik’s Revenge)</h4><p class="small">A step up in complexity.</p><a href="https://en.wikipedia.org/wiki/Rubik%27s_Revenge" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>5×5 (Professor’s Cube)</h4><p class="small">Even more layers and parity.</p><a href="https://en.wikipedia.org/wiki/Professor%27s_Cube" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Pyraminx</h4><p class="small">A tetrahedral puzzle.</p><a href="https://en.wikipedia.org/wiki/Pyraminx" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Megaminx</h4><p class="small">A dodecahedral challenge.</p><a href="https://en.wikipedia.org/wiki/Megaminx" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Skewb</h4><p class="small">A corner‑turning twisty puzzle.</p><a href="https://en.wikipedia.org/wiki/Skewb" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Square‑1</h4><p class="small">A shape‑shifting puzzle.</p><a href="https://en.wikipedia.org/wiki/Square-1_(puzzle)" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Mirror Cube</h4><p class="small">Solved by shape, not color.</p><a href="https://en.wikipedia.org/wiki/Mirror_Blocks" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Fisher Cube</h4><p class="small">A 3×3 shape mod.</p><a href="https://en.wikipedia.org/wiki/Fisher_Cube" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Windmill Cube</h4><p class="small">Offset layers create new shapes.</p><a href="https://en.wikipedia.org/wiki/Windmill_Cube" target="_blank" rel="noopener">Learn more</a></div>
+      <div class="link-card"><h4>Ghost Cube</h4><p class="small">Highly misaligned shape mod.</p><a href="https://en.wikipedia.org/wiki/Ghost_Cube" target="_blank" rel="noopener">Learn more</a></div>
+    </div>
+  </section>
+
+  <!-- RECORDS -->
+  <section id="records" class="page" aria-labelledby="records-tab">
+    <div class="prose">
+      <h2>Records</h2>
+      <p>Speedcubers push the limits with stunning times in 3×3, blindfolded, one‑handed, and many other events.
+         Records change often, and official listings are maintained by the World Cube Association.</p>
+      <div class="grid cols-3">
+        <div class="link-card">
+          <h4>Official Records</h4>
+          <p class="small">See current singles and averages for all events.</p>
+          <a href="https://www.worldcubeassociation.org/results/records" target="_blank" rel="noopener">WCA Records</a>
+        </div>
+        <div class="link-card">
+          <h4>World Championships</h4>
+          <p class="small">View champions and podiums from past years.</p>
+          <a href="https://www.worldcubeassociation.org/competitions?search=World%20Championship" target="_blank" rel="noopener">WCA Worlds</a>
+        </div>
+        <div class="link-card">
+          <h4>National Records</h4>
+          <p class="small">Filter by country or event.</p>
+          <a href="https://www.worldcubeassociation.org/results/records?show=national" target="_blank" rel="noopener">WCA National Records</a>
+        </div>
+      </div>
+      <p class="muted small">Tip: Use these links to find winners from the last 5 years across events and championships.</p>
+    </div>
+  </section>
+
+  <!-- WCA -->
+  <section id="wca" class="page" aria-labelledby="wca-tab">
+    <div class="prose">
+      <h2>World Cube Association (WCA)</h2>
+      <p>The WCA governs official speedcubing competitions globally. It sets rules, recognizes events,
+         tracks results, and maintains records. Competitions follow standardized regulations to ensure
+         fairness and comparability across countries.</p>
+      <div class="link-card">
+        <h4>Explore WCA</h4>
+        <p class="small">Find competitions, results, rules, and rankings.</p>
+        <a href="https://www.worldcubeassociation.org/" target="_blank" rel="noopener">worldcubeassociation.org</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ART & EXHIBITS -->
+  <section id="art" class="page" aria-labelledby="art-tab">
+    <div class="prose">
+      <h2>Art & Exhibits</h2>
+      <p>The cube inspires public art, murals, and sculptures. Many cities host cube‑themed works that
+         celebrate creativity and problem‑solving.</p>
+      <div class="grid cols-3">
+        <div class="link-card">
+          <h4>Rubik‑inspired Public Art</h4>
+          <p class="small">A mix of murals and sculptures around the world.</p>
+          <a href="https://en.wikipedia.org/wiki/Rubik%27s_Cube#In_popular_culture" target="_blank" rel="noopener">Explore examples</a>
+        </div>
+        <div class="link-card">
+          <h4>Rubik’s Cube Mosaics</h4>
+          <p class="small">Artists use hundreds of cubes to form images.</p>
+          <a href="https://en.wikipedia.org/wiki/Rubik%27s_Cube_mosaic" target="_blank" rel="noopener">Learn more</a>
+        </div>
+        <div class="link-card">
+          <h4>Gallery & Exhibitions</h4>
+          <p class="small">From design museums to local shows.</p>
+          <a href="https://www.rubiks.com/en-US/blogs" target="_blank" rel="noopener">Rubik’s Official Blog</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community" class="page" aria-labelledby="community-tab">
+    <div class="prose">
+      <h2>Community & Forums</h2>
+      <p>Connect with fellow cubers, ask questions, and share progress.</p>
+      <div class="grid cols-3">
+        <div class="link-card">
+          <h4>SpeedSolving Forum</h4>
+          <p class="small">Long‑standing community with guides and threads.</p>
+          <a href="https://www.speedsolving.com/forum/" target="_blank" rel="noopener">speedsolving.com</a>
+        </div>
+        <div class="link-card">
+          <h4>r/Cubers</h4>
+          <p class="small">Reddit community for tips and inspiration.</p>
+          <a href="https://www.reddit.com/r/Cubers/" target="_blank" rel="noopener">Reddit: r/Cubers</a>
+        </div>
+        <div class="link-card">
+          <h4>WCA Competitions</h4>
+          <p class="small">Find and attend events near you.</p>
+          <a href="https://www.worldcubeassociation.org/competitions" target="_blank" rel="noopener">Competition finder</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFERENCES -->
+  <section id="references" class="page" aria-labelledby="references-tab">
+    <div class="prose">
+      <h2>References</h2>
+      <ul>
+        <li><a href="https://www.worldcubeassociation.org/" target="_blank" rel="noopener">World Cube Association</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Rubik%27s_Cube" target="_blank" rel="noopener">Wikipedia: Rubik’s Cube</a></li>
+        <li><a href="https://ruwix.com/" target="_blank" rel="noopener">Ruwix (tutorials & info)</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- MY HOBBY -->
+  <section id="myhobby" class="page" aria-labelledby="myhobby-tab">
+    <div class="prose">
+      <h2>My Hobby</h2>
+      <p>I enjoy solving the 3×3 and exploring new methods. My goals:</p>
+      <ul>
+        <li>Learn efficient algorithms step by step.</li>
+        <li>Track solve times and see steady improvement.</li>
+        <li>Join local competitions for fun and learning.</li>
+      </ul>
+    </div>
+  
+<div class="gpt-wrap">
+  <button id="gpt-btn" class="gpt-btn" aria-label="Open MY GPT">
+    <span class="visually-hidden">MY GPT</span>
+    <div class="mosaic" aria-hidden="true">
+      <div class="letter" aria-hidden="true" data-letter="M">
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+</div>
+      <div class="letter" aria-hidden="true" data-letter="Y">
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+</div>
+      <span class="spacer-1"></span>
+      <div class="letter" aria-hidden="true" data-letter="G">
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+</div>
+      <div class="letter" aria-hidden="true" data-letter="P">
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span class="pix c6"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+</div>
+      <div class="letter" aria-hidden="true" data-letter="T">
+<span class="pix c1"></span>
+<span class="pix c2"></span>
+<span class="pix c3"></span>
+<span class="pix c4"></span>
+<span class="pix c5"></span>
+<span class="pix c6"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c2"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c3"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c4"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c5"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c6"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span class="pix c1"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+<span style="width:10px;height:10px;"></span>
+</div>
+    </div>
+  </button>
+</div>
+</section>
+
+  <footer>© 2025 Rubik’s Cube Hub • Built for a Data Analytics student project.</footer>
+</main>
+
+<script>
+// Simple hash-based "routing"
+const pages = document.querySelectorAll('section.page');
+const buttons = document.querySelectorAll('.tab-btn');
+
+function showPage(id){
+  pages.forEach(p=>p.classList.toggle('active', p.id===id));
+  buttons.forEach(b=>b.classList.toggle('active', b.dataset.target===id));
+  if(id!=='home'){ window.location.hash = id; } else { history.replaceState('', document.title, window.location.pathname + window.location.search); }
+}
+
+buttons.forEach(btn=>btn.addEventListener('click', ()=>showPage(btn.dataset.target)));
+
+window.addEventListener('load', ()=>{
+  const id = (location.hash||'#home').replace('#','');
+  const exists = Array.from(pages).some(p=>p.id===id);
+  showPage(exists? id : 'home');
+});
+
+// Fun facts (history, creator, art, science, math, algorithm)
+const facts = [
+  "Ernő Rubik invented the cube in 1974 as a teaching aid for 3D geometry.",
+  "The toy launched internationally in 1980 and became a global craze.",
+  "The standard 3×3 has 43 quintillion possible states.",
+  "God’s Number is 20: any 3×3 state can be solved in 20 moves or fewer.",
+  "Speedsolving methods include CFOP, Roux, and ZZ.",
+  "Modern cubes use magnets to make turns more stable and precise.",
+  "The cube helps develop spatial reasoning and pattern recognition.",
+  "There are official WCA events beyond 3×3, like 2×2, 4×4, OH, BLD, and FM.",
+  "Artists create mosaics from hundreds of cubes arranged by color.",
+  "Corner‑cutting is a design that lets faces turn even if not perfectly aligned.",
+  "Lubricants reduce friction and improve turning speed.",
+  "Parity issues can occur on even‑layer cubes like the 4×4.",
+  "The cube’s color scheme is typically White opposite Yellow, Blue opposite Green, and Red opposite Orange.",
+  "Average of 5 (Ao5) is a common measure used to compare times.",
+  "Blindfolded solving uses memorization and specific letter pair systems.",
+  "Fewest Moves Challenge (FMC) is solved on paper with move‑optimal solutions.",
+  "Stickerless cubes are now widely accepted in competitions.",
+  "Cube notation uses letters like R, U, L, F, B, D and modifiers ’ and 2.",
+  "Some algorithms are named after discoverers or popularizers.",
+  "Practice and look‑ahead are key skills for faster times.",
+  "The cube is a classic example in group theory and permutations.",
+  "Many national records are set by young solvers under 18.",
+  "World records change often as hardware and training improve.",
+  "The cube has appeared in films, museums, and public artworks.",
+  "CFOP stands for Cross, F2L, OLL, PLL.",
+  "OLL has 57 cases; PLL has 21 on a 3×3.",
+  "Roux builds blocks and orients edges before finishing corners and M slices.",
+  "ZZ starts by orienting all edges to simplify later steps.",
+  "Some cubes have adjustable tension and compression systems.",
+  "Solving can be both relaxing and competitive—your choice!"
+];
+
+const factBtn = document.getElementById('fact-btn');
+const factText = document.getElementById('fact-text');
+let used = new Set();
+
+function newFact(){
+  if(used.size === facts.length){ used.clear(); }
+  let idx;
+  do{ idx = Math.floor(Math.random()*facts.length); } while(used.has(idx));
+  used.add(idx);
+  factText.textContent = facts[idx];
+}
+
+factBtn.addEventListener('click', newFact);
+
+
+// Navigate to the custom GPT when clicking the MY GPT mosaic button
+const gptBtn = document.getElementById('gpt-btn');
+if (gptBtn){
+  gptBtn.addEventListener('click', ()=>{
+    window.location.href = 'https://chatgpt.com/g/g-68c38ca891488191a538defe6fb9ba70-the-donald-duck-rubik';
+  });
+}
+
+
+// Hover shuffle for mosaic cubelets + subtle pulse
+(function(){
+  const cubeColors = ['c1','c2','c3','c4','c5','c6'];
+  let shuffleTimer = null;
+
+  function shuffleCubelets(root){
+    if(!root) return;
+    const pix = root.querySelectorAll('.pix');
+    pix.forEach(el => {
+      // remove existing color classes
+      cubeColors.forEach(c => el.classList.remove(c));
+      // add a random one
+      const rand = cubeColors[Math.floor(Math.random()*cubeColors.length)];
+      el.classList.add(rand);
+    });
+  }
+
+  const gptBtn = document.getElementById('gpt-btn');
+  if (gptBtn){
+    const mosaic = gptBtn.querySelector('.mosaic');
+
+    gptBtn.addEventListener('mouseenter', () => {
+      gptBtn.classList.add('pulsing');
+      shuffleCubelets(mosaic);
+      // keep shuffling while hovered
+      shuffleTimer = setInterval(() => shuffleCubelets(mosaic), 600);
+    }, {passive:true});
+
+    gptBtn.addEventListener('mouseleave', () => {
+      gptBtn.classList.remove('pulsing');
+      if (shuffleTimer){ clearInterval(shuffleTimer); shuffleTimer = null; }
+    }, {passive:true});
+  }
+})();
+
+</script>
+</body>
+</html>
